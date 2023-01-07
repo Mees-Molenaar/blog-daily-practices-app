@@ -1,0 +1,43 @@
+name: flutter android integration test
+
+# Perform action when code is pushed to the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  android_integration_test:
+    runs-on: macOS-latest
+
+    steps:
+      # First checkout the new code
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      # We need atleast Java 11 or Higher to build your app with this version of Gradle
+      # So we use this Marketplace Action to install it
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.5.0
+        with:
+          distribution: "zulu"
+          java-version: "11.x"
+
+      # Use a handy action from the Github marketplace to install flutter
+      - name: Install and set Flutter version
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.0.5"
+          channel: "stable"
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      # Use a Github Action from the Marketplace to start an Android Emulator with api-level 23
+      - name: Start Emulator And Start Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 23
+          script: flutter test integration_test

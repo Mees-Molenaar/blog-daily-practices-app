@@ -1,0 +1,34 @@
+name: Flutter Web Integration Tests
+
+# Perform action when code is pushed to the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # First checkout the new code
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      # Use a handy action from the Github marketplace to install flutter
+      - name: Install and set Flutter version
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.0.5"
+          channel: "stable"
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      - name: Start Chromedriver
+        run: chromedriver --port=4444 &
+
+      - name: Run Web instrumentation test
+        run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d web-server

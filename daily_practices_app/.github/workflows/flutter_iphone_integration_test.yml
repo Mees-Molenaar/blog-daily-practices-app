@@ -1,0 +1,49 @@
+name: flutter iphone integration test
+
+# Perform action when code is pushed to the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  iphone_integration_test:
+    # NOTE: Running on macOS
+    runs-on: macOS-latest
+
+    # The device name is saved in an environment variable
+    # we use this environment variable to search for the device UDID
+    env:
+      device: 'iPhone 13 Simulator \(15.2\)'
+
+    steps:
+      # We list the simulators for debugging purposes
+      # when the device in the environment variable is not in this list
+      # we have to change it to one that is in the list
+      - name: List all simulators
+        run: xcrun xctrace list devices
+
+      # First checkout the new code
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      # Use a handy action from the Github marketplace to install flutter
+      - name: Install and set Flutter version
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.0.5"
+          channel: "stable"
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      # We first get the UDID of the device with an awk command
+      # Then we boot that device and use that device for the integration test with the -d flag
+      - name: Get UDID device, Start Simulator and Connect flutter
+        run: |
+          UDID=$(xcrun xctrace list devices | awk -F " " '/${{ env.device }}/ && length($5) > 1 {print $5}' | tr -d '()')
+          echo $UDID
+          xcrun simctl boot "${UDID:?No Simulator with this name found}"
+          flutter test integration_test -d $UDID
