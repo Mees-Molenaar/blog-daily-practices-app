@@ -10,7 +10,7 @@ jobs:
     runs-on: macOS-latest
     defaults:
       run:
-        working-directory: ./daily_practices_app
+        working-directory: daily_practices_app
 
     steps:
       # First checkout the new code
