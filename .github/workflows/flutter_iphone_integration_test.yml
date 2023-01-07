@@ -13,7 +13,7 @@ jobs:
     # The device name is saved in an environment variable
     # we use this environment variable to search for the device UDID
     env:
-      device: 'iPhone 13 Simulator \(15.2\)'
+      device: 'iPhone 13 Simulator \(16.0\)'
 
     steps:
       # We list the simulators for debugging purposes
