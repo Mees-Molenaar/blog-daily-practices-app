@@ -9,9 +9,6 @@ jobs:
   iphone_integration_test:
     # NOTE: Running on macOS
     runs-on: macOS-latest
-    defaults:
-      run:
-        working-directory: daily_practices_app
 
     # The device name is saved in an environment variable
     # we use this environment variable to search for the device UDID
