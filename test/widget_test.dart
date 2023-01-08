@@ -1,30 +1,84 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:daily_practices_app/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:daily_practices_app/main.dart';
+import 'package:daily_practices_app/app/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('DailyPracticeApp', () {
+    testWidgets('renders PracticesPage', (tester) async {
+      await tester.pumpWidget(
+        const DailyPracticeApp(),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      expect(find.byType(PracticesPage), findsOneWidget);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    group('PracticesPage', () {
+      testWidgets('renders PracticesView', (tester) async {
+        await tester.pumpWidget(
+          const DailyPracticeApp(),
+        );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+        expect(find.byType(PracticesView), findsOneWidget);
+      });
+    });
+
+    group('PracticesView', () {
+      Widget buildSubject() {
+        return const MaterialApp(home: PracticesView());
+      }
+
+      testWidgets('renders AppBar with title text', (tester) async {
+        await tester.pumpWidget(buildSubject());
+
+        expect(find.byType(AppBar), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text('Daily Practices'),
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('renders all listitems', (tester) async {
+        await tester.pumpWidget(buildSubject());
+
+        final listFinder = find.byType(Scrollable);
+        expect(listFinder, findsOneWidget);
+
+        // Verify that the first practice can be found
+        expect(find.text('Sleep eight hours'), findsOneWidget);
+
+        // Scroll to the bottom
+        await tester.fling(
+          listFinder,
+          const Offset(0, -500),
+          10000,
+        );
+        await tester.pumpAndSettle();
+
+        // Verify that the last practice can be found
+        expect(find.text('Deep breathing'), findsOneWidget);
+      });
+
+      testWidgets('one practice should be active', (tester) async {
+        await tester.pumpWidget(buildSubject());
+
+        final listFinder = find.byType(Scrollable);
+        expect(listFinder, findsOneWidget);
+
+        final activeItemFinder = find.byKey(const ValueKey('ActivePractice'));
+
+        // Find the active practice
+        await tester.scrollUntilVisible(
+          activeItemFinder,
+          500.0,
+          scrollable: listFinder,
+        );
+
+        expect(activeItemFinder, findsOneWidget);
+      });
+    });
   });
 }
