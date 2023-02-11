@@ -7,5 +7,9 @@ abstract class INotificationsApi {
   Future<List<ActiveNotification?>> getActiveNotifications();
 
   /// Set a new notification
-  Future<void> setNotification();
+  Future<void> setNotification(
+    String message,
+    DateTime notificationDate,
+    String timeZoneName,
+  );
 }
