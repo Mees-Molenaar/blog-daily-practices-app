@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:notification_api/notification_api.dart' as api;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -24,6 +23,12 @@ class LocalNotificationApi implements api.INotificationsApi {
     notificationsPlugin.initialize(
       initializationSettings,
     );
+
+    notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestPermission();
+
     _configureLocalTimeZone();
   }
 
@@ -64,6 +69,7 @@ class LocalNotificationApi implements api.INotificationsApi {
     final timeTZ =
         tz.TZDateTime.from(notificationDate, tz.getLocation(timeZoneName));
 
+    // TODO: ID can UUIDV4() worden
     return await notificationsPlugin.zonedSchedule(
       12456,
       'Daily Practices',
@@ -81,7 +87,6 @@ class LocalNotificationApi implements api.INotificationsApi {
 
   Future<void> _configureLocalTimeZone() async {
     tz.initializeTimeZones();
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    tz.setLocalLocation(tz.getLocation('Europe/Amsterdam'));
   }
 }
