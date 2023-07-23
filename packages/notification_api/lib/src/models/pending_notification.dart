@@ -1,9 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-class ActiveNotification extends Equatable {
-  /// Constructs an instance of [ActiveNotification].
-  const ActiveNotification({
+class PendingNotifications extends Equatable {
+  /// Constructs an instance of [PendingNotifications].
+  const PendingNotifications({
     required this.id,
     this.channelId,
     this.title,
@@ -30,19 +30,17 @@ class ActiveNotification extends Equatable {
 
   @override
   List<Object> get props {
-    return [
-      id,
-    ];
+    return [id, channelId ?? '', title ?? '', body ?? '', tag ?? ''];
   }
 
-  ActiveNotification copyWith({
+  PendingNotifications copyWith({
     int? id,
     String? channelId,
     String? title,
     String? body,
     String? tag,
   }) {
-    return ActiveNotification(
+    return PendingNotifications(
       id: id ?? this.id,
       channelId: channelId ?? this.channelId,
       title: title ?? this.title,

@@ -2,15 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:notification_api/src/models/active_notification.dart';
 
 void main() {
-  group('ActiveNotification', () {
-    ActiveNotification createSubject({
+  group('PendingNotification', () {
+    PendingNotifications createSubject({
       int id = 1,
       String? channelId = "test",
       String? title = "test",
       String? body = "test",
       String? tag = "test",
     }) {
-      return ActiveNotification(
+      return PendingNotifications(
           id: id, channelId: channelId, body: body, tag: tag);
     }
 

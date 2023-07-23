@@ -1,92 +1,49 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:local_notification_api/local_notification_api.dart';
+import 'package:local_notification_api/src/android_local_notification_api.dart';
+import 'package:local_notification_api/src/ios_local_notification_api.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
-class MockFlutterLocalNotificationsPlugin extends Mock
-    implements FlutterLocalNotificationsPlugin {}
-
-class FakeInitializationSettings extends Fake
-    implements InitializationSettings {}
-
-class FakeNotificationDetails extends Fake implements NotificationDetails {}
+class MockFlutterLocalNotificationsApi extends Mock
+    implements FlutterLocalNotificationsPlugin {
+  @override
+  Future<bool?> initialize(
+    InitializationSettings initializationSettings, {
+    DidReceiveNotificationResponseCallback? onDidReceiveNotificationResponse,
+    DidReceiveBackgroundNotificationResponseCallback?
+        onDidReceiveBackgroundNotificationResponse,
+  }) async {
+    return true;
+  }
+}
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   group('LocalNotificationApi', () {
-    TestWidgetsFlutterBinding.ensureInitialized();
+    final mockFlutterLocalNotifications = MockFlutterLocalNotificationsApi();
 
-    final mockFlutterLocalNotificationsPlugin =
-        MockFlutterLocalNotificationsPlugin();
-
-    tz.initializeTimeZones();
-    const timeZoneName = 'Europe/Amsterdam';
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
-    final notificationTime = tz.TZDateTime.now(tz.getLocation(timeZoneName));
-
-    LocalNotificationApi createSubject() {
-      return LocalNotificationApi(mockFlutterLocalNotificationsPlugin);
-    }
-
-    setUpAll(() {
-      registerFallbackValue(FakeInitializationSettings());
-      registerFallbackValue(notificationTime);
-      registerFallbackValue(FakeNotificationDetails());
-
-      when(() => mockFlutterLocalNotificationsPlugin.zonedSchedule(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            androidAllowWhileIdle: true,
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.absoluteTime,
-            matchDateTimeComponents: DateTimeComponents.time,
-          )).thenAnswer((_) async => {});
-
-      when(() => mockFlutterLocalNotificationsPlugin.initialize(any()))
-          .thenAnswer((_) => Future.value(true));
+    test('construct for android', () {
+      expect(
+          LocalNotificationApi(TargetPlatform.android.name, 'Test',
+              mockFlutterLocalNotifications),
+          isA<AndroidLocalNotificationApi>());
     });
 
-    group('constructur', () {
-      test('it should work correctly', () {
-        expect(createSubject, returnsNormally);
-      });
+    test('constructs for iOS', () {
+      expect(
+          LocalNotificationApi(TargetPlatform.iOS.name, 'Test',
+              MockFlutterLocalNotificationsApi()),
+          isA<IosLocalNotificationApi>());
     });
 
-    group('getActiveNotifications', () {
-      test('it should call the platform specific getActiveNotifications',
-          () async {
-        final notificationApi = createSubject();
-        notificationApi.getActiveNotifications();
-
-        verify(() => mockFlutterLocalNotificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.getActiveNotifications());
-      });
-    });
-
-    group('setNotification', () {
-      test('it should set a notification', () {
-        final notificationApi = createSubject();
-
-        notificationApi.setNotification('Test', notificationTime, timeZoneName);
-
-        verify(() => mockFlutterLocalNotificationsPlugin.zonedSchedule(
-              any(),
-              any(),
-              any(),
-              any(),
-              any(),
-              androidAllowWhileIdle: true,
-              uiLocalNotificationDateInterpretation:
-                  UILocalNotificationDateInterpretation.absoluteTime,
-              matchDateTimeComponents: DateTimeComponents.time,
-            )).called(1);
-      });
+    test('throws for Web', () {
+      expect(
+          () => LocalNotificationApi(
+              'Web', 'Test', MockFlutterLocalNotificationsApi()),
+          throwsA(isA<UnsupportedError>()));
     });
   });
 }
