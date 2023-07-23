@@ -7,7 +7,9 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    # Since the Flutter Local Notification Plugin is only implemented for mobile and not for ubuntu
+    # We should run it on MacOS
+    runs-on: macOS-latest
 
     steps:
       # First checkout the new code
