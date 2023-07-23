@@ -13,7 +13,7 @@ jobs:
     # The device name is saved in an environment variable
     # we use this environment variable to search for the device UDID
     env:
-      device: 'iPhone 13 Simulator \(16.0\)'
+      device: 'iPhone 13 Simulator \(16.2\)'
 
     steps:
       # We list the simulators for debugging purposes
@@ -30,7 +30,7 @@ jobs:
       - name: Install and set Flutter version
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.3.10"
+          flutter-version: "3.7.6"
           channel: "stable"
 
       - name: Show Flutter version
