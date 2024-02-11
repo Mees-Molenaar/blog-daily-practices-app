@@ -50,7 +50,7 @@ void main() {
       return 'Europe/Amsterdam';
     }
 
-    TestDefaultBinaryMessengerBinding.instance?.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, handler);
 
     IosLocalNotificationApi createSubject() {

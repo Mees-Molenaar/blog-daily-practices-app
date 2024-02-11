@@ -1,129 +1,24 @@
 import 'dart:math';
 
+import 'package:daily_practices_app/features/home/bloc/bloc/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
-
-const practices = <Map<String, dynamic>>[
-  {
-    'id': 1,
-    'practice': 'Sleep eight hours',
-  },
-  {
-    'id': 2,
-    'practice': 'Eat two meals instead of three',
-  },
-  {
-    'id': 3,
-    'practice': 'No TV (or YouTube)',
-  },
-  {
-    'id': 4,
-    'practice': 'No junk food',
-  },
-  {
-    'id': 5,
-    'practice': 'No complaining for one whole day',
-  },
-  {
-    'id': 6,
-    'practice': 'No gossip',
-  },
-  {
-    'id': 7,
-    'practice': 'Return an e-mail from five years ago',
-  },
-  {
-    'id': 8,
-    'practice': 'Express thanks to a friend',
-  },
-  {
-    'id': 9,
-    'practice': 'Watch a funny movie or a stand-up comic',
-  },
-  {
-    'id': 10,
-    'practice': 'Write down a list of ideas. The ideas can be about anything',
-  },
-  {
-    'id': 11,
-    'practice':
-        'Read a spiritual text. Any one that is inspirational to you. The bible, the Tao te Ching, anything you want',
-  },
-  {
-    'id': 12,
-    'practice':
-        'Say to yourself when you wake up, "I am going to save a life today. Keep an eye out for that life you can save',
-  },
-  {
-    'id': 13,
-    'practice': 'Take up a hobby. Do not say you do not have time',
-  },
-  {
-    'id': 14,
-    'practice':
-        'Write down your entire schedule. The schedule you do everyday. Cross out one item and do not do that anymore',
-  },
-  {
-    'id': 15,
-    'practice': 'Suprise someone',
-  },
-  {
-    'id': 16,
-    'practice': 'Think of ten people you are grateful for',
-  },
-  {
-    'id': 17,
-    'practice':
-        'Forgive someone. You do not have to tell them. Just write it down on a piece of paper and burn the paper (or throw it away)',
-  },
-  {
-    'id': 18,
-    'practice': 'Take the stairs instead of the elevator',
-  },
-  {
-    'id': 19,
-    'practice':
-        'When you find yourself thinking of that special someone who is causing you grief, think very quietly, "No". If you think of him and (or?) her again, think loudly, "No!" Again? Whisper, "No!" Again, say it. Louder. Yell it. Louder. And so on',
-  },
-  {
-    'id': 20,
-    'practice': 'Tell someone every day that you love them',
-  },
-  {
-    'id': 21,
-    'practice': 'Do not have sex with someone you do not love',
-  },
-  {
-    'id': 22,
-    'practice': 'Shower. Scrub. Clean the toxins of your body',
-  },
-  {
-    'id': 23,
-    'practice':
-        'Read a chapter in a biography about someone who is an inspiration to you',
-  },
-  {
-    'id': 24,
-    'practice': 'Make plans to spend time with a friend',
-  },
-  {
-    'id': 25,
-    'practice':
-        'If you think, "Everything would be better of if I were death" then think. "That is really cool. Now I can do anything I want and I can postpone this thought for a while, maybe even a few months." Because what does it matter now? The planet might not even be around in a few months',
-  },
-  {
-    'id': 26,
-    'practice': 'Deep breathing',
-  },
-];
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:practices_repository/practices_repository.dart';
 
 final activePractice = Random().nextInt(26) + 1;
 
 class PracticesPage extends StatelessWidget {
-  const PracticesPage({super.key});
+  final PracticesRepository practicesRepository;
+
+  const PracticesPage({super.key, required this.practicesRepository});
 
   @override
   Widget build(BuildContext context) {
-    return const PracticesView();
+    return BlocProvider(
+      create: (context) =>
+          HomeBloc(practicesRepository: practicesRepository)..add(HomeLoad()),
+      child: const PracticesView(),
+    );
   }
 }
 
@@ -136,44 +31,63 @@ class PracticesView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Daily Practices'),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: practices.length,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == activePractice) {
-            return Card(
-              key: const Key('ActivePractice'),
-              elevation: 3,
-              color: Theme.of(context).colorScheme.primary,
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    practices[index]['id'].toString(),
-                  ),
-                ),
-                title: Text(
-                  practices[index]['practice'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeInitial) {
+            return const Center(
+              // child: CircularProgressIndicator(),
+              child: Text('Initial'),
             );
+          } else if (state is HomeLoaded) {
+            return _buildListView(state.practices);
           } else {
-            return Card(
-              elevation: 3,
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(practices[index]['id'].toString()),
-                ),
-                title: Text(practices[index]['practice']),
-              ),
+            return const Center(
+              child: Text('Error while loading practices'),
             );
           }
         },
       ),
     );
   }
+}
+
+Widget _buildListView(List<Practice> practices) {
+  return ListView.builder(
+    padding: const EdgeInsets.all(8),
+    itemCount: practices.length,
+    itemBuilder: (BuildContext context, int index) {
+      if (index == activePractice) {
+        return Card(
+          key: const Key('ActivePractice'),
+          elevation: 3,
+          color: Theme.of(context).colorScheme.primary,
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                practices[index].id.toString(),
+              ),
+            ),
+            title: Text(
+              practices[index].practice,
+              style: const TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+      } else {
+        return Card(
+          elevation: 3,
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Text(practices[index].id.toString()),
+            ),
+            title: Text(practices[index].practice),
+          ),
+        );
+      }
+    },
+  );
 }

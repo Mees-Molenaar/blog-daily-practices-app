@@ -2,6 +2,7 @@ name: hardcoded_practices_api
 description: "A new Flutter package project."
 version: 0.0.1
 homepage:
+publish_to: 'none'
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -12,6 +13,7 @@ dependencies:
     sdk: flutter
   practices_api:
     path: ../practices_api
+  rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:

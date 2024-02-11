@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/meesmolenaar/development/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/meesmolenaar/EigenProjecten/flutter/blog-daily-practices-app/notification_api"
+export "FLUTTER_APPLICATION_PATH=/Users/meesmolenaar/Brain/Projects/blog-daily-practices-app/packages/notification_api"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"

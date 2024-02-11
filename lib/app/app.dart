@@ -2,8 +2,11 @@ import 'package:daily_practices_app/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_practices_app/theme/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hardcoded_practices_api/hardcoded_practices_api.dart';
 import 'package:local_notification_api/local_notification_api.dart';
 import 'dart:developer';
+
+import 'package:practices_repository/practices_repository.dart';
 
 Future<void> setNewNotification(BuildContext context) async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -36,7 +39,10 @@ Future<void> setNewNotification(BuildContext context) async {
 }
 
 class DailyPracticeApp extends StatelessWidget {
-  const DailyPracticeApp({super.key});
+  DailyPracticeApp({super.key});
+
+  final practicesRepository =
+      PracticesRepository(practicesApi: HardcodedPracticesApi());
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +52,9 @@ class DailyPracticeApp extends StatelessWidget {
           return MaterialApp(
             theme: FlutterPracticesTheme.light,
             darkTheme: FlutterPracticesTheme.dark,
-            home: const PracticesPage(),
+            home: PracticesPage(
+              practicesRepository: practicesRepository,
+            ),
           );
         });
   }
