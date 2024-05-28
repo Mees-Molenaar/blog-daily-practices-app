@@ -21,42 +21,36 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onInitial(HomeLoad event, Emitter<HomeState> emit) {
     final practicesStream = _practicesRepository.getPractices();
 
-    print("HELLO");
-
     practicesStream.listen((practices) {
-      print("IN LISTEN");
       emit(HomeLoaded(practices: practices));
     }).onError((error) {
-      print("AN ERROR OCCURED");
       log.severe('Error while loading practices: $error');
 
       emit(const HomeError(practices: []));
     });
-
-    print("THIS IS THE END");
   }
 
   @override
   void onEvent(HomeEvent event) {
     super.onEvent(event);
-    print(event);
+    log.fine('Event: $event');
   }
 
   @override
   void onChange(Change<HomeState> change) {
     super.onChange(change);
-    print(change);
+    log.fine('Change: $change');
   }
 
   @override
   void onTransition(Transition<HomeEvent, HomeState> transition) {
     super.onTransition(transition);
-    print(transition);
+    log.fine('Change: $transition');
   }
 
   @override
   void onError(Object error, StackTrace stackTrace) {
-    print('$error, $stackTrace');
     super.onError(error, stackTrace);
+    log.severe('Error: $error');
   }
 }
